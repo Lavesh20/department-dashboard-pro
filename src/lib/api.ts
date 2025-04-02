@@ -8,7 +8,7 @@ const API_URL = 'http://localhost:5000/api';
 const transformComplaintData = (complaint: any): Complaint => {
   // Map severity to our Priority type
   const mapSeverityToPriority = (severity: string): Priority => {
-    switch (severity.toLowerCase()) {
+    switch (severity?.toLowerCase()) {
       case 'high':
         return 'high';
       case 'medium':
@@ -22,14 +22,31 @@ const transformComplaintData = (complaint: any): Complaint => {
   const status: ComplaintStatus = complaint.status || 'new';
 
   return {
-    ...complaint, // Keep all original fields
-    id: complaint._id, // For compatibility with existing UI components
-    priority: mapSeverityToPriority(complaint.severity),
+    _id: complaint._id,
+    referenceNumber: complaint.referenceNumber || complaint._id.substring(0, 8),
+    content_platform: complaint.content_platform || 'General',
+    content_platform_details: complaint.content_platform_details || {
+      post_id: '',
+      date: new Date().toISOString(),
+      content: complaint.summary || '',
+      username: complaint.name || 'Anonymous',
+      url: '',
+    },
+    department: complaint.department || 'General',
+    location: complaint.location || '',
+    name: complaint.name || 'Anonymous',
+    severity: complaint.severity || 'low',
+    summary: complaint.summary || '',
+    complaint_score: complaint.complaint_score || 0,
+    
+    // Fields needed for UI functionality
+    id: complaint._id, // For backward compatibility
     status,
+    priority: mapSeverityToPriority(complaint.severity),
     submittedAt: complaint.content_platform_details?.date || new Date().toISOString(),
     category: complaint.content_platform || 'General',
     priorityScore: complaint.complaint_score || 0,
-    description: complaint.content_platform_details?.content || complaint.summary || '', // Add description for backward compatibility
+    description: complaint.content_platform_details?.content || complaint.summary || '', // For backward compatibility
   };
 };
 
@@ -44,6 +61,10 @@ export const fetchAllComplaints = async (): Promise<Complaint[]> => {
 };
 
 export const fetchDepartmentComplaints = async (department: string): Promise<Complaint[]> => {
+  if (department === 'all') {
+    return fetchAllComplaints();
+  }
+  
   try {
     const response = await axios.get(`${API_URL}/complaints/department/${department}`);
     return response.data.map(transformComplaintData);

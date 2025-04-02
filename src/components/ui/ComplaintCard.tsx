@@ -35,13 +35,13 @@ export function ComplaintCard({
            date.toLocaleDateString([], { month: 'short', day: 'numeric' });
   };
 
-  // Use either id or _id, whichever is available
+  // Get the complaint ID from either id or _id
   const complaintId = complaint.id || complaint._id;
   
   // Use reference number, or id/reference number as fallback
   const refNumber = complaint.referenceNumber || complaintId;
   
-  // Use either description or content or summary
+  // Use either description, content or summary
   const complaintText = complaint.description || 
                         complaint.content_platform_details?.content || 
                         complaint.summary || "";

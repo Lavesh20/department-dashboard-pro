@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { 
   Select, 
@@ -25,33 +25,104 @@ import {
   departments, 
   kpis, 
   departmentScores,
-  complaints,
   staffMembers
 } from "@/lib/mockData";
-import { TimePeriod } from "@/lib/types";
+import { TimePeriod, Complaint } from "@/lib/types";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { fetchAllComplaints, fetchDepartmentComplaints } from "@/lib/api";
+import { AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const DashboardPage = () => {
   const [selectedDept, setSelectedDept] = useState(departments[0].id);
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>("week");
 
-  const handleAssign = (complaint: any) => {
+  // Fetch complaints from the backend
+  const { data: complaints = [], isLoading, error } = useQuery({
+    queryKey: ['complaints', selectedDept],
+    queryFn: () => selectedDept === 'all' 
+      ? fetchAllComplaints() 
+      : fetchDepartmentComplaints(selectedDept),
+  });
+
+  const handleAssign = (complaint: Complaint) => {
     toast.success("Complaint assigned successfully", {
       description: `Complaint ${complaint.referenceNumber || complaint._id} has been assigned.`
     });
   };
 
-  const handleEscalate = (complaint: any) => {
+  const handleEscalate = (complaint: Complaint) => {
     toast.info("Complaint escalated", {
       description: `Complaint ${complaint.referenceNumber || complaint._id} has been escalated to higher priority.`
     });
   };
 
-  const handleResolve = (complaint: any) => {
+  const handleResolve = (complaint: Complaint) => {
     toast.success("Complaint resolved", {
       description: `Complaint ${complaint.referenceNumber || complaint._id} has been marked as resolved.`
     });
   };
+
+  // Filter complaints by status
+  const getComplaintsByStatus = (status: string) => {
+    return complaints.filter(c => (c.status || 'new') === status).slice(0, 3);
+  };
+
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <div className="space-y-6 animate-fade-in">
+          <header className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+            <div>
+              <h1 className="h1">Department Overview</h1>
+              <p className="text-muted-foreground mt-1">
+                Loading data...
+              </p>
+            </div>
+          </header>
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="flex flex-col items-center">
+              <div className="animate-spin h-12 w-12 border-4 border-primary border-t-transparent rounded-full mb-4"></div>
+              <p>Loading data from backend...</p>
+            </div>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <MainLayout>
+        <div className="space-y-6 animate-fade-in">
+          <header className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+            <div>
+              <h1 className="h1">Department Overview</h1>
+              <p className="text-muted-foreground mt-1">
+                Error loading data
+              </p>
+            </div>
+          </header>
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="flex flex-col items-center text-center max-w-md">
+              <AlertCircle className="h-12 w-12 text-destructive mb-4" />
+              <h2 className="text-xl font-semibold mb-2">Failed to load complaints</h2>
+              <p className="text-muted-foreground mb-4">
+                There was an error connecting to the backend service. Please check your connection or try again later.
+              </p>
+              <Button 
+                onClick={() => window.location.reload()}
+                variant="outline"
+              >
+                Retry
+              </Button>
+            </div>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
   
   return (
     <MainLayout>
@@ -124,60 +195,68 @@ const DashboardPage = () => {
                 </div>
                 
                 <TabsContent value="new" className="mt-0 space-y-3">
-                  {complaints
-                    .filter(c => c.status === "new")
-                    .slice(0, 3)
-                    .map(complaint => (
+                  {getComplaintsByStatus('new').length > 0 ? (
+                    getComplaintsByStatus('new').map(complaint => (
                       <ComplaintCard 
-                        key={complaint.id} 
+                        key={complaint._id} 
                         complaint={complaint} 
                         onAssign={handleAssign}
                         onEscalate={handleEscalate}
                       />
                     ))
-                  }
+                  ) : (
+                    <div className="text-center py-4 text-muted-foreground">
+                      No new complaints
+                    </div>
+                  )}
                 </TabsContent>
                 
                 <TabsContent value="assigned" className="mt-0 space-y-3">
-                  {complaints
-                    .filter(c => c.status === "assigned")
-                    .slice(0, 3)
-                    .map(complaint => (
+                  {getComplaintsByStatus('assigned').length > 0 ? (
+                    getComplaintsByStatus('assigned').map(complaint => (
                       <ComplaintCard 
-                        key={complaint.id} 
+                        key={complaint._id} 
                         complaint={complaint} 
                         onEscalate={handleEscalate}
                       />
                     ))
-                  }
+                  ) : (
+                    <div className="text-center py-4 text-muted-foreground">
+                      No assigned complaints
+                    </div>
+                  )}
                 </TabsContent>
                 
                 <TabsContent value="in-progress" className="mt-0 space-y-3">
-                  {complaints
-                    .filter(c => c.status === "in-progress")
-                    .slice(0, 3)
-                    .map(complaint => (
+                  {getComplaintsByStatus('in-progress').length > 0 ? (
+                    getComplaintsByStatus('in-progress').map(complaint => (
                       <ComplaintCard 
-                        key={complaint.id} 
+                        key={complaint._id} 
                         complaint={complaint} 
                         onResolve={handleResolve}
                       />
                     ))
-                  }
+                  ) : (
+                    <div className="text-center py-4 text-muted-foreground">
+                      No in-progress complaints
+                    </div>
+                  )}
                 </TabsContent>
                 
                 <TabsContent value="pending-input" className="mt-0 space-y-3">
-                  {complaints
-                    .filter(c => c.status === "pending-input")
-                    .slice(0, 3)
-                    .map(complaint => (
+                  {getComplaintsByStatus('pending-input').length > 0 ? (
+                    getComplaintsByStatus('pending-input').map(complaint => (
                       <ComplaintCard 
-                        key={complaint.id} 
+                        key={complaint._id} 
                         complaint={complaint} 
                         onResolve={handleResolve}
                       />
                     ))
-                  }
+                  ) : (
+                    <div className="text-center py-4 text-muted-foreground">
+                      No pending-input complaints
+                    </div>
+                  )}
                 </TabsContent>
               </Tabs>
             </CardContent>
