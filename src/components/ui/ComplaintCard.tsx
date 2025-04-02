@@ -37,25 +37,31 @@ export function ComplaintCard({
   
   return (
     <Card className={cn("complaint-card group", className)}>
-      <div className={cn("self-stretch", priorityClass[complaint.priority])} />
+      <div className={cn(
+        "self-stretch", 
+        complaint.priority ? priorityClass[complaint.priority as Priority] : "priority-medium"
+      )} />
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center space-x-2">
-            <span className="font-mono text-xs text-muted-foreground">{complaint.id}</span>
+            <span className="font-mono text-xs text-muted-foreground">{complaint.referenceNumber || complaint._id}</span>
             <Badge 
               variant="outline" 
               className="text-xs bg-secondary/50 hover:bg-secondary"
             >
-              {complaint.category}
+              {complaint.category || complaint.content_platform}
             </Badge>
           </div>
           <div className="flex items-center text-xs text-muted-foreground">
             <Clock className="h-3 w-3 mr-1 inline" />
-            <span>{formatDate(complaint.submittedAt)}</span>
+            <span>
+              {complaint.submittedAt ? formatDate(complaint.submittedAt) : 
+                complaint.content_platform_details?.date ? formatDate(complaint.content_platform_details.date) : "N/A"}
+            </span>
           </div>
         </div>
         
-        <p className="text-sm line-clamp-2 mb-3">{complaint.description}</p>
+        <p className="text-sm line-clamp-2 mb-3">{complaint.summary || complaint.content_platform_details?.content || ""}</p>
         
         <div className="opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2 justify-end">
           <TooltipProvider>

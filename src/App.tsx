@@ -13,7 +13,16 @@ import AnalyticsPage from "./pages/AnalyticsPage";
 import CommunicationPage from "./pages/CommunicationPage";
 import SettingsPage from "./pages/SettingsPage";
 
-const queryClient = new QueryClient();
+// Configure the query client with some defaults
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>

@@ -22,15 +22,32 @@ export type Priority = "high" | "medium" | "low";
 
 export type ComplaintStatus = "new" | "assigned" | "in-progress" | "pending-input" | "resolved";
 
+// Updated to match MongoDB backend schema
 export type Complaint = {
-  id: string;
-  category: string;
-  description: string;
-  submittedAt: string;
-  status: ComplaintStatus;
-  priority: Priority;
+  _id: string;
+  referenceNumber: string;
+  content_platform: string;
+  content_platform_details: {
+    post_id: string;
+    date: string;
+    content: string;
+    username: string;
+    url: string;
+  };
+  department: string;
+  location: string;
+  name: string;
+  severity: string;
+  summary: string;
+  complaint_score: number;
+  
+  // Fields needed for UI functionality, will be derived from backend data
+  status?: ComplaintStatus;
+  priority?: Priority;
+  submittedAt?: string;
+  category?: string;
   assignedTo?: Staff;
-  priorityScore: number;
+  priorityScore?: number;
 };
 
 export type StaffStatus = "online" | "busy" | "offline";

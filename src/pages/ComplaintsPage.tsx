@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { 
   Select, 
@@ -24,14 +24,16 @@ import {
   Search, 
   Filter, 
   Plus,
-  ArrowUpDown
+  ArrowUpDown,
+  AlertCircle
 } from "lucide-react";
 import { 
-  complaints,
   departments
 } from "@/lib/mockData";
 import { Complaint, Priority, ComplaintStatus } from "@/lib/types";
 import { toast } from "sonner";
+import { fetchAllComplaints, fetchDepartmentComplaints } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
 
 const ComplaintsPage = () => {
   const [view, setView] = useState<"board" | "list">("board");
@@ -39,42 +41,123 @@ const ComplaintsPage = () => {
   const [priorityFilter, setPriorityFilter] = useState<Priority | "all">("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [selectedDept, setSelectedDept] = useState(departments[0].id);
+  const [categories, setCategories] = useState<string[]>([]);
+
+  // Fetch complaints
+  const { data: complaints = [], isLoading, error } = useQuery({
+    queryKey: ['complaints', selectedDept],
+    queryFn: () => selectedDept === 'all' 
+      ? fetchAllComplaints() 
+      : fetchDepartmentComplaints(selectedDept),
+  });
 
   // Extract unique categories from complaints
-  const categories = Array.from(new Set(complaints.map(c => c.category)));
+  useEffect(() => {
+    if (complaints && complaints.length > 0) {
+      const uniqueCategories = Array.from(
+        new Set(complaints.map(c => c.category || c.content_platform))
+      );
+      setCategories(uniqueCategories);
+    }
+  }, [complaints]);
 
   const filteredComplaints = complaints.filter(complaint => {
-    const matchesSearch = complaint.description.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                         complaint.id.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesPriority = priorityFilter === "all" || complaint.priority === priorityFilter;
-    const matchesCategory = categoryFilter === "all" || complaint.category === categoryFilter;
+    const matchesSearch = 
+      (complaint.summary?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      complaint.referenceNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      complaint._id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      complaint.content_platform_details?.content?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      false);
+    
+    const matchesPriority = 
+      priorityFilter === "all" || 
+      complaint.priority === priorityFilter ||
+      complaint.severity?.toLowerCase() === priorityFilter;
+    
+    const complaintCategory = complaint.category || complaint.content_platform;
+    const matchesCategory = categoryFilter === "all" || complaintCategory === categoryFilter;
     
     return matchesSearch && matchesPriority && matchesCategory;
   });
 
   const handleAssign = (complaint: Complaint) => {
     toast.success("Complaint assigned successfully", {
-      description: `Complaint ${complaint.id} has been assigned.`
+      description: `Complaint ${complaint.referenceNumber || complaint._id} has been assigned.`
     });
   };
 
   const handleEscalate = (complaint: Complaint) => {
     toast.info("Complaint escalated", {
-      description: `Complaint ${complaint.id} has been escalated to higher priority.`
+      description: `Complaint ${complaint.referenceNumber || complaint._id} has been escalated to higher priority.`
     });
   };
 
   const handleResolve = (complaint: Complaint) => {
     toast.success("Complaint resolved", {
-      description: `Complaint ${complaint.id} has been marked as resolved.`
+      description: `Complaint ${complaint.referenceNumber || complaint._id} has been marked as resolved.`
     });
   };
 
   const statusColumns: ComplaintStatus[] = ["new", "assigned", "in-progress", "pending-input", "resolved"];
 
   const getFilteredComplaintsByStatus = (status: ComplaintStatus) => {
-    return filteredComplaints.filter(c => c.status === status);
+    return filteredComplaints.filter(c => (c.status || 'new') === status);
   };
+
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <div className="space-y-6 animate-fade-in">
+          <header className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+            <div>
+              <h1 className="text-2xl font-bold">Complaint Management</h1>
+              <p className="text-muted-foreground mt-1">
+                Loading complaints...
+              </p>
+            </div>
+          </header>
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="flex flex-col items-center">
+              <div className="animate-spin h-12 w-12 border-4 border-primary border-t-transparent rounded-full mb-4"></div>
+              <p>Loading complaints data...</p>
+            </div>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <MainLayout>
+        <div className="space-y-6 animate-fade-in">
+          <header className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+            <div>
+              <h1 className="text-2xl font-bold">Complaint Management</h1>
+              <p className="text-muted-foreground mt-1">
+                Error loading complaints
+              </p>
+            </div>
+          </header>
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="flex flex-col items-center text-center max-w-md">
+              <AlertCircle className="h-12 w-12 text-destructive mb-4" />
+              <h2 className="text-xl font-semibold mb-2">Failed to load complaints</h2>
+              <p className="text-muted-foreground mb-4">
+                There was an error connecting to the backend service. Please check your connection or try again later.
+              </p>
+              <Button 
+                onClick={() => window.location.reload()}
+                variant="outline"
+              >
+                Retry
+              </Button>
+            </div>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
@@ -143,6 +226,7 @@ const ComplaintsPage = () => {
                 <SelectValue placeholder="Select Department" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="all">All Departments</SelectItem>
                 {departments.map((dept) => (
                   <SelectItem key={dept.id} value={dept.id}>
                     {dept.name}
@@ -173,7 +257,7 @@ const ComplaintsPage = () => {
                   <div className="space-y-2 max-h-[calc(100vh-220px)] overflow-y-auto p-1">
                     {getFilteredComplaintsByStatus(status).map((complaint) => (
                       <div 
-                        key={complaint.id} 
+                        key={complaint._id} 
                         className="bg-card transition-all transform hover:-translate-y-1 active:scale-95 cursor-grab"
                         draggable
                       >
@@ -207,11 +291,11 @@ const ComplaintsPage = () => {
               <div className="space-y-2">
                 {filteredComplaints.map((complaint) => (
                   <ComplaintCard 
-                    key={complaint.id} 
+                    key={complaint._id} 
                     complaint={complaint} 
-                    onAssign={complaint.status === "new" ? handleAssign : undefined}
-                    onEscalate={["new", "assigned", "in-progress"].includes(complaint.status) ? handleEscalate : undefined}
-                    onResolve={["in-progress", "pending-input"].includes(complaint.status) ? handleResolve : undefined}
+                    onAssign={(complaint.status || 'new') === "new" ? handleAssign : undefined}
+                    onEscalate={["new", "assigned", "in-progress"].includes(complaint.status || 'new') ? handleEscalate : undefined}
+                    onResolve={["in-progress", "pending-input"].includes(complaint.status || 'new') ? handleResolve : undefined}
                   />
                 ))}
                 {filteredComplaints.length === 0 && (
