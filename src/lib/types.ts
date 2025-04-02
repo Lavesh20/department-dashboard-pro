@@ -48,6 +48,10 @@ export type Complaint = {
   category?: string;
   assignedTo?: Staff;
   priorityScore?: number;
+  
+  // Backward compatibility for existing code
+  id?: string; // This allows us to keep compatibility with existing code
+  description?: string; // For backward compatibility
 };
 
 export type StaffStatus = "online" | "busy" | "offline";

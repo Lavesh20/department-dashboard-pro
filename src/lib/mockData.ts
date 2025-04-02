@@ -1,4 +1,3 @@
-
 import { 
   Department, 
   KPI, 
@@ -104,96 +103,257 @@ export const departmentScores: Record<string, number> = {
   "d5": 86
 };
 
+// Updated mock complaints to match the new Complaint type
 export const complaints: Complaint[] = [
   {
-    id: "C1001",
-    category: "Road Maintenance",
-    description: "Pothole on Main Street causing traffic hazards",
-    submittedAt: "2023-05-10T09:30:00Z",
+    _id: "C1001",
+    id: "C1001", // For backward compatibility
+    referenceNumber: "C1001",
+    content_platform: "Road Maintenance",
+    content_platform_details: {
+      post_id: "P123",
+      date: "2023-05-10T09:30:00Z",
+      content: "Pothole on Main Street causing traffic hazards",
+      username: "citizen123",
+      url: "http://example.com/post/123"
+    },
+    department: "d1",
+    location: "Main Street",
+    name: "John Doe",
+    severity: "high",
+    summary: "Pothole on Main Street causing traffic hazards",
+    complaint_score: 87,
     status: "new",
     priority: "high",
-    priorityScore: 87
+    submittedAt: "2023-05-10T09:30:00Z",
+    category: "Road Maintenance",
+    priorityScore: 87,
+    description: "Pothole on Main Street causing traffic hazards" // For backward compatibility
   },
   {
-    id: "C1002",
-    category: "Waste Management",
-    description: "Missed garbage collection for 2 weeks",
-    submittedAt: "2023-05-09T14:15:00Z",
+    _id: "C1002",
+    id: "C1002", // For backward compatibility
+    referenceNumber: "C1002",
+    content_platform: "Waste Management",
+    content_platform_details: {
+      post_id: "P124",
+      date: "2023-05-09T14:15:00Z",
+      content: "Missed garbage collection for 2 weeks",
+      username: "citizen456",
+      url: "http://example.com/post/124"
+    },
+    department: "d1",
+    location: "Oak Avenue",
+    name: "Jane Smith",
+    severity: "medium",
+    summary: "Missed garbage collection for 2 weeks",
+    complaint_score: 65,
     status: "assigned",
     priority: "medium",
-    priorityScore: 65
+    submittedAt: "2023-05-09T14:15:00Z",
+    category: "Waste Management",
+    priorityScore: 65,
+    description: "Missed garbage collection for 2 weeks" // For backward compatibility
   },
   {
-    id: "C1003",
-    category: "Street Lighting",
-    description: "Broken street light at 5th and Park",
-    submittedAt: "2023-05-08T16:45:00Z",
+    _id: "C1003",
+    id: "C1003", // For backward compatibility
+    referenceNumber: "C1003",
+    content_platform: "Street Lighting",
+    content_platform_details: {
+      post_id: "P125",
+      date: "2023-05-08T16:45:00Z",
+      content: "Broken street light at 5th and Park",
+      username: "citizen789",
+      url: "http://example.com/post/125"
+    },
+    department: "d1",
+    location: "5th and Park",
+    name: "David Johnson",
+    severity: "low",
+    summary: "Broken street light at 5th and Park",
+    complaint_score: 42,
     status: "in-progress",
     priority: "low",
-    priorityScore: 42
+    submittedAt: "2023-05-08T16:45:00Z",
+    category: "Street Lighting",
+    priorityScore: 42,
+    description: "Broken street light at 5th and Park" // For backward compatibility
   },
   {
-    id: "C1004",
-    category: "Water Supply",
-    description: "Brown water coming from taps in Cedar neighborhood",
-    submittedAt: "2023-05-10T08:20:00Z",
+    _id: "C1004",
+    id: "C1004", // For backward compatibility
+    referenceNumber: "C1004",
+    content_platform: "Water Supply",
+    content_platform_details: {
+      post_id: "P126",
+      date: "2023-05-10T08:20:00Z",
+      content: "Brown water coming from taps in Cedar neighborhood",
+      username: "citizen101",
+      url: "http://example.com/post/126"
+    },
+    department: "d1",
+    location: "Cedar neighborhood",
+    name: "Linda Brown",
+    severity: "high",
+    summary: "Brown water coming from taps in Cedar neighborhood",
+    complaint_score: 91,
     status: "pending-input",
     priority: "high",
-    priorityScore: 91
+    submittedAt: "2023-05-10T08:20:00Z",
+    category: "Water Supply",
+    priorityScore: 91,
+    description: "Brown water coming from taps in Cedar neighborhood" // For backward compatibility
   },
   {
-    id: "C1005",
-    category: "Sidewalk Repair",
-    description: "Cracked sidewalk creating accessibility issues",
-    submittedAt: "2023-05-07T11:10:00Z",
+    _id: "C1005",
+    id: "C1005", // For backward compatibility
+    referenceNumber: "C1005",
+    content_platform: "Sidewalk Repair",
+    content_platform_details: {
+      post_id: "P127",
+      date: "2023-05-07T11:10:00Z",
+      content: "Cracked sidewalk creating accessibility issues",
+      username: "citizen202",
+      url: "http://example.com/post/127"
+    },
+    department: "d1",
+    location: "Elm Street",
+    name: "Robert Green",
+    severity: "medium",
+    summary: "Cracked sidewalk creating accessibility issues",
+    complaint_score: 67,
     status: "resolved",
     priority: "medium",
-    priorityScore: 67
+    submittedAt: "2023-05-07T11:10:00Z",
+    category: "Sidewalk Repair",
+    priorityScore: 67,
+    description: "Cracked sidewalk creating accessibility issues" // For backward compatibility
   },
   {
-    id: "C1006",
-    category: "Road Maintenance",
-    description: "Large sinkhole forming on Elm Street",
-    submittedAt: "2023-05-10T07:45:00Z",
+    _id: "C1006",
+    id: "C1006", // For backward compatibility
+    referenceNumber: "C1006",
+    content_platform: "Road Maintenance",
+    content_platform_details: {
+      post_id: "P128",
+      date: "2023-05-10T07:45:00Z",
+      content: "Large sinkhole forming on Elm Street",
+      username: "citizen303",
+      url: "http://example.com/post/128"
+    },
+    department: "d1",
+    location: "Elm Street",
+    name: "Susan White",
+    severity: "high",
+    summary: "Large sinkhole forming on Elm Street",
+    complaint_score: 95,
     status: "new",
     priority: "high",
-    priorityScore: 95
+    submittedAt: "2023-05-10T07:45:00Z",
+    category: "Road Maintenance",
+    priorityScore: 95,
+    description: "Large sinkhole forming on Elm Street" // For backward compatibility
   },
   {
-    id: "C1007",
-    category: "Noise Complaint",
-    description: "Construction noise outside permitted hours",
-    submittedAt: "2023-05-09T19:30:00Z",
+    _id: "C1007",
+    id: "C1007", // For backward compatibility
+    referenceNumber: "C1007",
+    content_platform: "Noise Complaint",
+    content_platform_details: {
+      post_id: "P129",
+      date: "2023-05-09T19:30:00Z",
+      content: "Construction noise outside permitted hours",
+      username: "citizen404",
+      url: "http://example.com/post/129"
+    },
+    department: "d1",
+    location: "Pine Avenue",
+    name: "Michael Black",
+    severity: "medium",
+    summary: "Construction noise outside permitted hours",
+    complaint_score: 63,
     status: "assigned",
     priority: "medium",
-    priorityScore: 63
+    submittedAt: "2023-05-09T19:30:00Z",
+    category: "Noise Complaint",
+    priorityScore: 63,
+    description: "Construction noise outside permitted hours" // For backward compatibility
   },
   {
-    id: "C1008",
-    category: "Traffic Signal",
-    description: "Traffic light stuck on red at 12th Avenue intersection",
-    submittedAt: "2023-05-10T06:25:00Z",
+    _id: "C1008",
+    id: "C1008", // For backward compatibility
+    referenceNumber: "C1008",
+    content_platform: "Traffic Signal",
+    content_platform_details: {
+      post_id: "P130",
+      date: "2023-05-10T06:25:00Z",
+      content: "Traffic light stuck on red at 12th Avenue intersection",
+      username: "citizen505",
+      url: "http://example.com/post/130"
+    },
+    department: "d1",
+    location: "12th Avenue intersection",
+    name: "Karen Blue",
+    severity: "high",
+    summary: "Traffic light stuck on red at 12th Avenue intersection",
+    complaint_score: 89,
     status: "in-progress",
     priority: "high",
-    priorityScore: 89
+    submittedAt: "2023-05-10T06:25:00Z",
+    category: "Traffic Signal",
+    priorityScore: 89,
+    description: "Traffic light stuck on red at 12th Avenue intersection" // For backward compatibility
   },
   {
-    id: "C1009",
-    category: "Public Parks",
-    description: "Playground equipment damaged and unsafe",
-    submittedAt: "2023-05-08T15:40:00Z",
+    _id: "C1009",
+    id: "C1009", // For backward compatibility
+    referenceNumber: "C1009",
+    content_platform: "Public Parks",
+    content_platform_details: {
+      post_id: "P131",
+      date: "2023-05-08T15:40:00Z",
+      content: "Playground equipment damaged and unsafe",
+      username: "citizen606",
+      url: "http://example.com/post/131"
+    },
+    department: "d1",
+    location: "Central Park",
+    name: "Thomas Gray",
+    severity: "medium",
+    summary: "Playground equipment damaged and unsafe",
+    complaint_score: 72,
     status: "pending-input",
     priority: "medium",
-    priorityScore: 72
+    submittedAt: "2023-05-08T15:40:00Z",
+    category: "Public Parks",
+    priorityScore: 72,
+    description: "Playground equipment damaged and unsafe" // For backward compatibility
   },
   {
-    id: "C1010",
-    category: "Drainage",
-    description: "Flooding on Oak Street after light rain",
-    submittedAt: "2023-05-09T13:15:00Z",
+    _id: "C1010",
+    id: "C1010", // For backward compatibility
+    referenceNumber: "C1010",
+    content_platform: "Drainage",
+    content_platform_details: {
+      post_id: "P132",
+      date: "2023-05-09T13:15:00Z",
+      content: "Flooding on Oak Street after light rain",
+      username: "citizen707",
+      url: "http://example.com/post/132"
+    },
+    department: "d1",
+    location: "Oak Street",
+    name: "Jennifer Silver",
+    severity: "high",
+    summary: "Flooding on Oak Street after light rain",
+    complaint_score: 84,
     status: "new",
     priority: "high",
-    priorityScore: 84
+    submittedAt: "2023-05-09T13:15:00Z",
+    category: "Drainage",
+    priorityScore: 84,
+    description: "Flooding on Oak Street after light rain" // For backward compatibility
   }
 ];
 

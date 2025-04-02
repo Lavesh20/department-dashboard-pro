@@ -34,6 +34,17 @@ export function ComplaintCard({
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ', ' + 
            date.toLocaleDateString([], { month: 'short', day: 'numeric' });
   };
+
+  // Use either id or _id, whichever is available
+  const complaintId = complaint.id || complaint._id;
+  
+  // Use reference number, or id/reference number as fallback
+  const refNumber = complaint.referenceNumber || complaintId;
+  
+  // Use either description or content or summary
+  const complaintText = complaint.description || 
+                        complaint.content_platform_details?.content || 
+                        complaint.summary || "";
   
   return (
     <Card className={cn("complaint-card group", className)}>
@@ -44,7 +55,7 @@ export function ComplaintCard({
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center space-x-2">
-            <span className="font-mono text-xs text-muted-foreground">{complaint.referenceNumber || complaint._id}</span>
+            <span className="font-mono text-xs text-muted-foreground">{refNumber}</span>
             <Badge 
               variant="outline" 
               className="text-xs bg-secondary/50 hover:bg-secondary"
@@ -61,7 +72,7 @@ export function ComplaintCard({
           </div>
         </div>
         
-        <p className="text-sm line-clamp-2 mb-3">{complaint.summary || complaint.content_platform_details?.content || ""}</p>
+        <p className="text-sm line-clamp-2 mb-3">{complaintText}</p>
         
         <div className="opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2 justify-end">
           <TooltipProvider>

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { 
@@ -27,14 +26,12 @@ const StaffPage = () => {
   const [selectedDept, setSelectedDept] = useState(departments[0].id);
   const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
 
-  // Filter staff based on search and status filter
   const filteredStaff = staffMembers.filter(staff => {
     const matchesSearch = staff.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === "all" || staff.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  // Sort staff based on selected sort criteria
   const sortedStaff = [...filteredStaff].sort((a, b) => {
     if (sortBy === "name") {
       return a.name.localeCompare(b.name);
@@ -48,7 +45,7 @@ const StaffPage = () => {
   const handleAssignToStaff = (complaint: any) => {
     if (selectedStaff) {
       toast.success("Complaint assigned successfully", {
-        description: `Complaint ${complaint.id} has been assigned to ${selectedStaff.name}.`
+        description: `Complaint ${complaint.referenceNumber || complaint._id} has been assigned to ${selectedStaff.name}.`
       });
     } else {
       toast.error("No staff member selected", {
@@ -57,7 +54,6 @@ const StaffPage = () => {
     }
   };
 
-  // Simulate getting available complaints
   const availableComplaints = complaints.filter(c => c.status === "new" || c.status === "assigned");
 
   return (
@@ -132,7 +128,6 @@ const StaffPage = () => {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Staff List */}
           <div className="lg:col-span-1 space-y-4">
             <Card>
               <CardHeader className="pb-2">
@@ -163,7 +158,6 @@ const StaffPage = () => {
             </Card>
           </div>
           
-          {/* Staff Details and Assignment */}
           <div className="lg:col-span-2 space-y-4">
             {selectedStaff ? (
               <>
@@ -196,7 +190,7 @@ const StaffPage = () => {
                         {availableComplaints.length > 0 ? (
                           availableComplaints.map((complaint) => (
                             <div 
-                              key={complaint.id} 
+                              key={complaint._id || complaint.id} 
                               className="cursor-pointer transition-all hover:scale-[1.01]"
                               draggable
                               onDragEnd={() => handleAssignToStaff(complaint)}

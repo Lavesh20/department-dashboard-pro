@@ -37,19 +37,19 @@ const DashboardPage = () => {
 
   const handleAssign = (complaint: any) => {
     toast.success("Complaint assigned successfully", {
-      description: `Complaint ${complaint.id} has been assigned.`
+      description: `Complaint ${complaint.referenceNumber || complaint._id} has been assigned.`
     });
   };
 
   const handleEscalate = (complaint: any) => {
     toast.info("Complaint escalated", {
-      description: `Complaint ${complaint.id} has been escalated to higher priority.`
+      description: `Complaint ${complaint.referenceNumber || complaint._id} has been escalated to higher priority.`
     });
   };
 
   const handleResolve = (complaint: any) => {
     toast.success("Complaint resolved", {
-      description: `Complaint ${complaint.id} has been marked as resolved.`
+      description: `Complaint ${complaint.referenceNumber || complaint._id} has been marked as resolved.`
     });
   };
   

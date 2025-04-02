@@ -1,13 +1,13 @@
 
 import axios from 'axios';
-import { Complaint } from './types';
+import { Complaint, ComplaintStatus, Priority } from './types';
 
 const API_URL = 'http://localhost:5000/api';
 
 // Transform backend data to match our frontend structure
 const transformComplaintData = (complaint: any): Complaint => {
   // Map severity to our Priority type
-  const mapSeverityToPriority = (severity: string): "high" | "medium" | "low" => {
+  const mapSeverityToPriority = (severity: string): Priority => {
     switch (severity.toLowerCase()) {
       case 'high':
         return 'high';
@@ -29,6 +29,7 @@ const transformComplaintData = (complaint: any): Complaint => {
     submittedAt: complaint.content_platform_details?.date || new Date().toISOString(),
     category: complaint.content_platform || 'General',
     priorityScore: complaint.complaint_score || 0,
+    description: complaint.content_platform_details?.content || complaint.summary || '', // Add description for backward compatibility
   };
 };
 

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { 
@@ -49,16 +48,13 @@ const SLAMonitoringPage = () => {
   const [selectedDept, setSelectedDept] = useState(departments[0].id);
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>("week");
   
-  // Calculate SLA stats
   const totalSLACases = slaCases.length;
   const onTrackCases = slaCases.filter(c => c.status === "on-track").length;
   const atRiskCases = slaCases.filter(c => c.status === "at-risk").length;
   const breachedCases = slaCases.filter(c => c.status === "breached").length;
   
-  // Get the SLA compliance percentage
   const slaCompliance = Math.round((onTrackCases / totalSLACases) * 100);
   
-  // Format date for the timeline
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return {
@@ -67,7 +63,6 @@ const SLAMonitoringPage = () => {
     };
   };
   
-  // Get color for SLA status
   const getStatusColor = (status: SLAStatus) => {
     switch (status) {
       case "on-track": return "bg-green-100 text-green-800 border-green-300";
@@ -77,15 +72,13 @@ const SLAMonitoringPage = () => {
     }
   };
   
-  // Get SLA cases with complaint details
   const slaCasesWithDetails = slaCases.map(slaCase => {
-    const complaint = complaints.find(c => c.id === slaCase.complaintId);
+    const complaint = complaints.find(c => c.id === slaCase.complaintId || c._id === slaCase.complaintId);
     return {
       ...slaCase,
       complaint
     };
   }).sort((a, b) => {
-    // Sort by status: breached first, then at-risk, then on-track
     const statusOrder: Record<SLAStatus, number> = {
       "breached": 0,
       "at-risk": 1,
@@ -98,6 +91,12 @@ const SLAMonitoringPage = () => {
     toast.success("Report exported", {
       description: "SLA monitoring report has been exported to CSV"
     });
+  };
+  
+  const getComplaintText = (complaint: any) => {
+    return complaint?.description || 
+           complaint?.content_platform_details?.content || 
+           complaint?.summary || "";
   };
   
   return (
@@ -306,8 +305,10 @@ const SLAMonitoringPage = () => {
                     >
                       <div className="flex justify-between">
                         <div>
-                          <div className="font-medium">{slaCase.complaint?.category} - {slaCase.complaintId}</div>
-                          <div className="text-sm line-clamp-1">{slaCase.complaint?.description}</div>
+                          <div className="font-medium">
+                            {slaCase.complaint?.category || slaCase.complaint?.content_platform} - {slaCase.complaintId}
+                          </div>
+                          <div className="text-sm line-clamp-1">{getComplaintText(slaCase.complaint)}</div>
                         </div>
                         <div className="text-right">
                           <div className="text-sm font-medium">
@@ -332,8 +333,10 @@ const SLAMonitoringPage = () => {
                       >
                         <div className="flex justify-between">
                           <div>
-                            <div className="font-medium">{slaCase.complaint?.category} - {slaCase.complaintId}</div>
-                            <div className="text-sm line-clamp-1">{slaCase.complaint?.description}</div>
+                            <div className="font-medium">
+                              {slaCase.complaint?.category || slaCase.complaint?.content_platform} - {slaCase.complaintId}
+                            </div>
+                            <div className="text-sm line-clamp-1">{getComplaintText(slaCase.complaint)}</div>
                           </div>
                           <div className="text-right">
                             <div className="text-sm font-medium">
@@ -358,8 +361,10 @@ const SLAMonitoringPage = () => {
                       >
                         <div className="flex justify-between">
                           <div>
-                            <div className="font-medium">{slaCase.complaint?.category} - {slaCase.complaintId}</div>
-                            <div className="text-sm line-clamp-1">{slaCase.complaint?.description}</div>
+                            <div className="font-medium">
+                              {slaCase.complaint?.category || slaCase.complaint?.content_platform} - {slaCase.complaintId}
+                            </div>
+                            <div className="text-sm line-clamp-1">{getComplaintText(slaCase.complaint)}</div>
                           </div>
                           <div className="text-right">
                             <div className="text-sm font-medium">
